@@ -1,0 +1,24 @@
+{
+   "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "allowJs": true,
+      "esModuleInterop": true,
+      "pretty": true,
+      "target": "es6",
+      "outDir": "./dist",
+      "baseUrl": ".",
+      "paths": {
+         "db/*": ["dist/db/*"],
+         "lib/*": ["dist/lib/*"]
+      }
+  },
+  "include": [
+     "lib",
+     "db"
+  ],
+  "exclude": [
+     "node_modules",
+     "dist"
+  ]
+}
