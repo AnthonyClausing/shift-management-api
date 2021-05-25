@@ -11,10 +11,12 @@ class App {
   private user_routes: UserRoutes = new UserRoutes();
   
   constructor() {
-     this.app = express(); 
+    this.app = express();
+    this.app.use(express.urlencoded({ extended: false }))
+    this.app.use(express.json())
     this.test_routes.route(this.app);
-     this.user_routes.route(this.app);
-     this.common_routes.route(this.app);
+    this.user_routes.route(this.app);
+    this.common_routes.route(this.app);
   }
 }
 export default new App().app;
