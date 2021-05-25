@@ -1,6 +1,6 @@
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('location_user_shifts').del()
+  return knex('location_user_shifts').truncate()
     .then(function () {
       // Inserts seed entries
       return knex('location_user_shifts').insert([
