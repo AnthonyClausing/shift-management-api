@@ -1,7 +1,3 @@
-
-// const configOptions = knexfile[env];
-// console.log( configOptions ,'hello')
-// export default knex(configOptions)
 import Knex from 'knex';
 import knexfile from '../knexfile';
 const env = process.env.NODE_ENV || 'development';
