@@ -5,16 +5,21 @@ import Auth from './auth'
 //trying to query with user was not working, adding double qoutes seems to fix it
 //https://stackoverflow.com/a/67628318
 const create = async(user, company) => {
-  const hashedPassword = await Auth.hashPassword(user.password)
-  const token = await Auth.createToken()
-  delete user.password
-  user.password_digest = hashedPassword
-  user.token = token
-  const userQuery = await database.raw(
-    'INSERT INTO "user" (company_id, email, password_digest, auth_token, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, email, auth_token',
-    [company.id, user.email, user.password_digest, user.token, user.first_name, user.last_name]
-  )
-  return userQuery.rows[0]
+  try {
+    const hashedPassword = await Auth.hashPassword(user.password)
+    const token = await Auth.createToken()
+    delete user.password
+    user.password_digest = hashedPassword
+    user.token = token
+    const userQuery = await database.raw(
+      'INSERT INTO "user" (company_id, email, password_digest, auth_token, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, email, auth_token',
+      [company.id, user.email, user.password_digest, user.token, user.first_name, user.last_name]
+    )
+    return userQuery.rows[0]
+  }catch(err) {
+    throw new Error(`Could not create user, constraint error [${err.constraint}]: ${err.detail}`)
+  }
+
 }
 
 const createAssociations = async(user, company, location) => {
@@ -39,8 +44,10 @@ const createAssociations = async(user, company, location) => {
   }
 }
 
+//if datbase isnt connected will database.raw still return undefined?
 const findBy = async (identifier, value) => {
   const userQuery = await database.raw(`SELECT * FROM "user" WHERE ${identifier} = ?`, [value])
+  if(!userQuery.rows[0]) throw new Error(`Could not find User where ${identifier} = ${value}`)
   return userQuery.rows[0]
 }
 
