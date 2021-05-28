@@ -1,21 +1,14 @@
 import { Application, Request, Response } from 'express';
+import UserController from '../controllers/user'
 
 export class UserRoutes {
     public route(app: Application) {
-      
-      app.post('/users/login', async(req, res) => {
-        try{
-          let {email, password} = req.body
-          res.sendStatus(200)
-        }catch(e) {
-          console.log("!!!!ERROR!!!!",e)
-          res.sendStatus(500)
-        }
-      })
+      app.post('/users/signup', UserController.signup)
+
+      app.post('/users/signin', UserController.signin)
 
       app.get("/users/me", async (req, res) => {
         res.sendStatus(200)
       });
-
     }
 }

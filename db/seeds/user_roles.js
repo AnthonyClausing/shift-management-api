@@ -1,6 +1,6 @@
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('user_roles').del()
+  return knex('user_roles').truncate()
     .then(function () {
       // Inserts seed entries
       return knex('user_roles').insert([

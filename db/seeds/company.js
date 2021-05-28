@@ -1,11 +1,11 @@
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('company').del()
+  return knex('company').truncate()
     .then(function () {
       // Inserts seed entries
       return knex('company').insert([
-        {id: 1, name: 'Best Test Electronics'},
-        {id: 2, name: 'Target Testers'}
+        {name: 'Best Test Electronics'},
+        {name: 'Target Testers'}
       ]);
     });
 };

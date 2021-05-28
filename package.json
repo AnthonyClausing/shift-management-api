@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "tsc && node ./dist/lib/server.js",
     "migrate": "knex migrate:latest",
     "unmigrate": "knex migrate:rollback",
     "seed": "knex seed:run",
