@@ -7,7 +7,7 @@ class App {
 
   public app: express.Application;
   private test_routes: TestRoutes = new TestRoutes();
-  private common_routes: TestRoutes = new CommonRoutes();
+  private common_routes: CommonRoutes = new CommonRoutes();
   private user_routes: UserRoutes = new UserRoutes();
   
   constructor() {

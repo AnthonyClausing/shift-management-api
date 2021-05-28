@@ -1,5 +1,5 @@
 import { Application, Request, Response } from 'express';
-import UserController from '../controllers/user.js'
+import UserController from '../controllers/user'
 
 export class UserRoutes {
     public route(app: Application) {

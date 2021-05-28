@@ -10,7 +10,7 @@ const create = async(location, company) => {
     )
     return locationQuery.rows[0]
   } catch(err) {
-    console.log(err)
+    throw new Error(`Could not create location, constraint error [${err.constraint}]: ${err.detail}`)
   }
 }
 

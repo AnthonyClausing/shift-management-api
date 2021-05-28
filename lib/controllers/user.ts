@@ -12,7 +12,6 @@ const signup = async(request, response) => {
   try {
     const params = request.body
     const existingUser = await User.findBy('email', params.user.email)
-    console.log(existingUser,'in controller')
     if(existingUser) {
       throw new Error('A User with this email already exists')
     }

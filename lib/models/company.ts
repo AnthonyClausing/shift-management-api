@@ -10,7 +10,7 @@ const create = async(company) => {
     )
     return companyQuery.rows[0]
   } catch(err) {
-    console.log(`constraint error [${err.constraint}]: ${err.detail}`)
+    throw new Error(`Could not create company, constraint error [${err.constraint}]: ${err.detail}`)
   }
 }
 
