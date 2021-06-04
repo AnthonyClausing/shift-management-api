@@ -1,7 +1,6 @@
 {
-  "watch": ["./dist/lib/server.js", "./lib/"],
-  "ext": "js, ts, css",
-  "events": {
-    "restart": "tsc"
-  }
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": [],
+  "exec": "ts-node ./src/lib/server.ts"
 }
