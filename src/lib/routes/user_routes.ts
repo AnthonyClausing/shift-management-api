@@ -7,7 +7,7 @@ export class UserRoutes {
 
       app.post('/users/signin', UserController.signin)
 
-      app.get("/users/me", async (req, res) => {
+      app.get("/users/me", async (req: Request, res: Response) => {
         res.sendStatus(200)
       });
     }

@@ -2,15 +2,15 @@ import Location  from '../models/location'
 import Company from '../models/company'
 import User from '../models/user'
 import Auth from '../models/auth'
-import { request, response } from 'express';
+import { Request, Response } from 'express';
 
 //TODO
 //FRONTEND: authenticate before any route, and if the route is signup, redirect to home
 //leverage Express middleware to handle authorization on protected routes
 //Separate signup for users who are signing up from an email sent by owner/manager/admin(?)
-const signup = async(request, response) => {
+const signup = async(req: Request, res: Response) => {
   try {
-    const params = request.body
+    const params = req.body
     const existingUser = await User.findBy('email', params.user.email)
     if(existingUser) {
       throw new Error('A User with this email already exists')
@@ -21,35 +21,35 @@ const signup = async(request, response) => {
     const newCompany = await Company.create(params.company)
     const newLocation = await Location.create(params.location, newCompany)
     const newUser = await User.create(params.user, newCompany)
-    await User.createAssociations({...newUser, role: 'owner'}, newCompany, newLocation)
-    response.status(201).json({ user: newUser })
+    await User.createAssociations({...newUser, role: 'owner'}, newCompany.id, newLocation.id)
+    res.status(201).json({ user: newUser })
   } catch(e) {
-    response.json({"status": 400, "error": e.message})
+    res.json({"status": 400, "error": e.message})
   }
 }
 
-const signin = async(request, response) => {
+const signin = async(req: Request, res: Response) => {
   try {
-    const params = request.body
+    const params = req.body
     let user = await User.findBy('email', params.user.email)
     await Auth.checkPassword(params.user.password, user)
     let token = await Auth.createToken()
     await User.updateToken(token, user)
     delete user.password_digest
-    response.status(200).json(user)
+    res.status(200).json(user)
   } catch(e) { 
-    response.json({"status": 400, "error": e.message})
+    res.json({"status": 400, "error": e.message})
   }
 }
 
-const signout = async(request, response) => {
+const signout = async(req: Request, res: Response) => {
   try {
-    const params = request.body
+    const params = req.body
     const user = await User.findBy('email', params.user.email)
     await User.updateToken(null, user)
-    response.status(200)
+    res.status(200)
   } catch(e) {
-    response.json({"status": 400, "error": e.message})
+    res.json({"status": 400, "error": e.message})
   }
 }
 
