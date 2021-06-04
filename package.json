@@ -53,6 +53,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
+    "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
     "nodemon": "^2.0.7",
     "prettier": "2.3.0",
@@ -73,9 +74,9 @@
   },
   "lint-staged": {
     "./src/*.{ts,tsx}": [
-      "npx prettier --write",
+      "npx prettier --write ./src",
       "eslint src/*.ts --fix-dry-run",
-      "git add"
+      "git add -A ."
     ]
   }
 }
