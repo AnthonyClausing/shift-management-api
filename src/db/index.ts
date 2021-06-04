@@ -6,11 +6,11 @@ export const timestamp = (): string => new Date().toUTCString()
 
 export class Connection {
   public knex(): Knex {
-      return knex(exportConfig())
+    return knex(exportConfig())
   }
 }
 
 function exportConfig() {
-  const environment : string = process.env.NODE_ENV || 'development'
+  const environment: string = process.env.NODE_ENV || 'development'
   return knexfile[environment]
 }
