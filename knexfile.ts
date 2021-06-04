@@ -6,7 +6,7 @@ dotenv.config()
 interface Config {
   client: string,
   connection: string,
-  migrations: { 
+  migrations: {
     directory: string
   },
   seeds: {
@@ -15,26 +15,8 @@ interface Config {
   useNullAsDefault: boolean
 }
 
-const database : { [key: string]: Config }  = {
-  'development': {
-    client: 'pg',
-    connection: process.env.DATABASE_URL || '',
-    migrations: {
-      directory: path.resolve('./src/db/migrations'),
-    },
-    seeds: { directory: path.resolve('./src/db/seeds')  },
-    useNullAsDefault: true
-  },
-  'test': {
-    client: 'pg',
-    connection: process.env.TEST_DATABASE_URL || '',
-    migrations: {
-      directory: path.resolve('./src/db/migrations'),
-    },
-    seeds: { directory: path.resolve('./src/db/seeds')  },
-    useNullAsDefault: true
-  },
-  'production': {
+const database : { [key: string]: Config } = {
+  development: {
     client: 'pg',
     connection: process.env.DATABASE_URL || '',
     migrations: {
@@ -43,7 +25,24 @@ const database : { [key: string]: Config }  = {
     seeds: { directory: path.resolve('./src/db/seeds') },
     useNullAsDefault: true
   },
-} 
+  test: {
+    client: 'pg',
+    connection: process.env.TEST_DATABASE_URL || '',
+    migrations: {
+      directory: path.resolve('./src/db/migrations'),
+    },
+    seeds: { directory: path.resolve('./src/db/seeds') },
+    useNullAsDefault: true
+  },
+  production: {
+    client: 'pg',
+    connection: process.env.DATABASE_URL || '',
+    migrations: {
+      directory: path.resolve('./src/db/migrations'),
+    },
+    seeds: { directory: path.resolve('./src/db/seeds') },
+    useNullAsDefault: true
+  },
+}
 
 export = database
-
