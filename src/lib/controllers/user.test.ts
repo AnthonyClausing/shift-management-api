@@ -50,10 +50,6 @@ describe('Integration Tests', function () {
     await User.createAssociations({ ...firstUser, role: 'owner' }, company.id, location.id)
   })
 
-  afterAll(async () => {
-    await truncate()
-  })
-
   describe('POST /users/signup', () => {
     const newUserParams = {
       user: {
