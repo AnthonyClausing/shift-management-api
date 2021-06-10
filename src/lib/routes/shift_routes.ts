@@ -1,4 +1,4 @@
-import { Application, Request, Response } from 'express'
+import { Application } from 'express'
 import LocationUserShiftController from '../controllers/locationUserShift'
 
 export class UserShiftRoutes {
