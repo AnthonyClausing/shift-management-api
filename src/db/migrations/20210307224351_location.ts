@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<any> {
     t.text('county').notNullable()
     t.dateTime('created_at', { precision: 6 }).defaultTo(knex.fn.now(6)).notNullable()
     t.dateTime('updated_at', { precision: 6 }).defaultTo(knex.fn.now(6)).notNullable()
-    t.unique(['company_id'], 'index_locations_on_company_id')
+    // t.unique(['company_id'], 'index_locations_on_company_id')
   })
 }
 

@@ -1,36 +1,40 @@
-import { Connection } from '../../db'
+import { db } from '../../db'
 import Auth from './auth'
-import { CompanyParams } from './company'
-const db = new Connection().knex()
 
 //trying to query with user was not working, adding double qoutes seems to fix it
 //https://stackoverflow.com/a/67628318
 export interface UserParams {
   password: string
-  password_digest: string
-  token: string
   email: string
   first_name: string
   last_name: string
 }
+export interface UserData {
+  id: number
+  email: string
+  auth_token: string
+}
 
-const create = async (user: UserParams, company: CompanyParams) => {
+const create = async (params: UserParams, companyId: number): Promise<UserData> => {
   try {
-    const hashedPassword = await Auth.hashPassword(user.password)
+    const hashedPassword = await Auth.hashPassword(params.password)
     const token = await Auth.createToken()
-    user.password_digest = hashedPassword
-    user.token = token
+    const user = { ...params, password_digest: hashedPassword, token }
     const userQuery = await db.raw(
       'INSERT INTO "user" (company_id, email, password_digest, auth_token, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, email, auth_token',
-      [company.id, user.email, user.password_digest, user.token, user.first_name, user.last_name]
+      [companyId, user.email, user.password_digest, user.token, user.first_name, user.last_name]
     )
     return userQuery.rows[0]
   } catch (err) {
-    throw new Error(`Could not create user, constraint error [${err.constraint}]: ${err.detail}`)
+    throw new Error('Could not create user in User Model')
   }
 }
 
-const createAssociations = async (user: { id: any; role: any }, companyId: string, locationId: string) => {
+const createAssociations = async (
+  user: { id: number; role: string },
+  companyId: number,
+  locationId: number
+): Promise<void> => {
   try {
     //look up way to combine into one query?
     //Better performance? 1 person shouldnt require 6 separate db calls
@@ -39,21 +43,20 @@ const createAssociations = async (user: { id: any; role: any }, companyId: strin
     //possibly add multiple roles capability?
     await db.raw('INSERT INTO user_roles (user_id, role) VALUES (?, ?)', [user.id, user.role])
   } catch (err) {
-    console.error(err)
+    throw new Error(`Could not create association for user with id of ${user.id}`)
   }
 }
 
 //if datbase isnt connected will database.raw still return undefined?
 const findBy = async (identifier: any, value: any) => {
   const userQuery = await db.raw(`SELECT * FROM "user" WHERE ${identifier} = ?`, [value])
-  if (!userQuery.rows[0]) throw new Error(`Could not find User where ${identifier} = ${value}`)
   return userQuery.rows[0]
 }
 
-const updateToken = async (token: any, user: { id: any }) => {
+const updateToken = async (token: any, id: number) => {
   const updatedUser = await db.raw('UPDATE "user" SET auth_token = ? WHERE id = ? RETURNING id, email, auth_token', [
     token,
-    user.id,
+    id,
   ])
   return updatedUser.rows[0]
 }
