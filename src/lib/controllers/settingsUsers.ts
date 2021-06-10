@@ -7,6 +7,7 @@ const index = async (req: Request, res: Response) => {
   try {
     // const users = await User.findBy(request.params.location_id)
     // response.status(200).json(shifts)
+    res.sendStatus(200)
   } catch (e) {
     res.json({ status: 400, error: e.message })
   }
@@ -26,7 +27,7 @@ const create = async (req: Request, res: Response) => {
   // email user's email
   try {
     // const newUser = await User.create({...request.body, ...request.params})
-    res.status(201) //.json({ shift: newShift })
+    res.sendStatus(201) //.json({ shift: newShift })
   } catch (e) {
     res.json({ status: 400, error: e.message })
   }

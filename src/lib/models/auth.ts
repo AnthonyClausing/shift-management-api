@@ -30,7 +30,7 @@ const checkPassword = async (rawPassword: string, user: { password_digest: strin
       } else if (response) {
         resolve(response)
       } else {
-        reject(new Error('Passwords do not match.'))
+        reject(new Error('Passwords do not match'))
       }
     })
   )

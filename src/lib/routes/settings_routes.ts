@@ -1,11 +1,12 @@
-import { Application, Request, Response } from 'express'
-import SettingsUsersController from '../controllers/settings_users'
-import SettingsLocationsController from '../controllers/settings_locations'
+import { Application } from 'express'
+import SettingsUsersController from '../controllers/settingsUsers'
+import SettingsLocationsController from '../controllers/settingsLocations'
 
 export class SettingsRoutes {
   public route(app: Application) {
-    app.get('/:location_id/setting_users', SettingsUsersController.index)
-    app.get('/:location_id/settings_locations', SettingsLocationsController.create)
-    //app.put('/') //  update shifts
+    app.get('/:location_id/settings_users', SettingsUsersController.index)
+    app.post('/:location_id/settings_users', SettingsUsersController.create)
+    app.get('/:location_id/settings_locations', SettingsLocationsController.index)
+    app.post('/:location_id/settings_locations', SettingsLocationsController.create)
   }
 }

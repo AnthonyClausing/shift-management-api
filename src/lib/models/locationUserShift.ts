@@ -1,16 +1,14 @@
-import { Connection } from '../../db'
+import { db } from '../../db'
 
 export interface ShiftParams {
-  user_id: string
+  user_id: number
   day: string
   month: string
   year: string
   start_at: string
   end_at: string
-  location_id: string
+  location_id: number
 }
-
-const db = new Connection().knex()
 
 const create = async (shiftInfo: ShiftParams) => {
   try {
