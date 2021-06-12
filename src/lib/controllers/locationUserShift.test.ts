@@ -37,24 +37,36 @@ describe('Integration Tests', function () {
     },
   }
   let location: { id: number }
+  let firstUser: { id: number }
   beforeAll(async () => {
     await truncate()
     const company = await Company.create(initialParams.company)
     location = await Location.create(initialParams.location, company.id)
-    const firstUser = await User.create(initialParams.user, company.id)
+    firstUser = await User.create(initialParams.user, company.id)
     await User.createAssociations({ ...firstUser, role: 'owner' }, company.id, location.id)
   })
 
   describe('GET /:location_id/shifts', () => {
-    it('returns status of 200', async () => {
+    it('returns status of 200 and empty list', async () => {
       const result = await request(app).get(`/${location.id}/shifts`)
       expect(result.status).toBe(200)
+      expect(result.body).toBe([])
     })
   })
   describe('POST /:location_id/shifts', () => {
-    it('returns status of 201', async () => {
-      const result = await request(app).post(`/${location.id}/shifts`)
+    it('returns status of 201 and created shift', async () => {
+      const result = await request(app).post(`/${location.id}/shifts`).send({
+        user_id: firstUser.id,
+        day: 27,
+        month: 6,
+        year: 2021,
+        start_at: '09:00:00',
+        end_at: '17:00:00',
+      })
       expect(result.status).toBe(201)
+      //TODO: FIX this shift user/loc_ids returnig as strings
+      expect(result.body.shift.location_id).toBe(location.id)
+      expect(result.body.shift.user_id).toBe(firstUser.id)
     })
   })
 })
