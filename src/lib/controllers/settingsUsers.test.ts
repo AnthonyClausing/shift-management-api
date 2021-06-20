@@ -1,4 +1,5 @@
 import User from '../../lib/models/user'
+import Auth from '../../lib/models/auth'
 import Company from '../../lib/models/company'
 import Location from '../../lib/models/location'
 import request from 'supertest'
@@ -13,7 +14,7 @@ async function promiseEach(tables: string[], fn: (t: string) => Promise<void>) {
   }
 }
 async function truncate() {
-  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" cascade`))
+  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" RESTART IDENTITY`))
 }
 
 describe('Integration Tests', function () {
@@ -37,24 +38,49 @@ describe('Integration Tests', function () {
     },
   }
   let location: { id: number }
+  let token: string
+  let firstUser: any
   beforeAll(async () => {
     await truncate()
     const company = await Company.create(initialParams.company)
     location = await Location.create(initialParams.location, company.id)
-    const firstUser = await User.create(initialParams.user, company.id)
+    firstUser = await User.create(initialParams.user, company.id)
+    token = await Auth.createToken()
+    await User.updateToken(token, firstUser.id)
     await User.createAssociations({ ...firstUser, role: 'owner' }, company.id, location.id)
   })
 
   describe('GET /:location_id/settings_users', () => {
     it('returns status of 200', async () => {
-      const result = await request(app).get(`/${location.id}/settings_users`)
+      const result = await request(app).get(`/${location.id}/settings_users`).set('token', token)
       expect(result.status).toBe(200)
+      expect(result.body[0].email).toBe(initialParams.user.email)
     })
   })
+
   describe('POST /:location_id/settings_users', () => {
     it('returns status of 201', async () => {
-      const result = await request(app).post(`/${location.id}/settings_users`)
+      const email = 'Test@settings_user.com'
+      const result = await request(app)
+        .post(`/${location.id}/settings_users`)
+        .set('token', token)
+        .send({ user: { email, first_name: 'Super', last_name: 'Test', role: 'Manager' } })
       expect(result.status).toBe(201)
+      expect(result.body.user.email).toBe(email)
+    })
+  })
+
+  describe('PUT /:location_id/settings_users', () => {
+    it('returns status of 200', async () => {
+      const newFirstName = 'Put'
+      const newLastName = 'Request'
+      const result = await request(app)
+        .put(`/${location.id}/settings_users`)
+        .set('token', token)
+        .send({ user: { first_name: newFirstName, last_name: newLastName, id: firstUser.id } })
+      expect(result.status).toBe(200)
+      expect(result.body.user.first_name).toBe(newFirstName)
+      expect(result.body.user.last_name).toBe(newLastName)
     })
   })
 })

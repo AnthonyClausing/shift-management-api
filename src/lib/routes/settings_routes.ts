@@ -6,6 +6,7 @@ export class SettingsRoutes {
   public route(app: Application) {
     app.get('/:location_id/settings_users', SettingsUsersController.index)
     app.post('/:location_id/settings_users', SettingsUsersController.create)
+    app.put('/:location_id/settings_users', SettingsUsersController.update)
     app.get('/:location_id/settings_locations', SettingsLocationsController.index)
     app.post('/:location_id/settings_locations', SettingsLocationsController.create)
   }

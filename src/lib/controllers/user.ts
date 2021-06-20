@@ -23,7 +23,8 @@ const signup = async (req: Request, res: Response) => {
     const newLocation = await Location.create(params.location, newCompany.id)
     const newUser = await User.create(params.user, newCompany.id)
     await User.createAssociations({ id: newUser.id, role: 'owner' }, newCompany.id, newLocation.id)
-    //
+    const token = await Auth.createToken()
+    await User.updateToken(token, newUser.id)
     res.status(201).json({ user: newUser })
   } catch (e) {
     res.status(400).json({ error: e.message })
@@ -35,8 +36,9 @@ const signin = async (req: Request, res: Response) => {
     const params = req.body
     const user = await User.findBy('email', params.user.email)
     if (user) {
-      await Auth.checkPassword(params.user.password, user)
+      await Auth.checkPassword(params.user.password, user.password_digest || '')
       const token = await Auth.createToken()
+      //add token to json data
       await User.updateToken(token, user.id)
       delete user.password_digest
       res.status(200).json(user)
@@ -52,7 +54,7 @@ const signout = async (req: Request, res: Response) => {
   try {
     const params = req.body
     const user = await User.findBy('email', params.user.email)
-    await User.updateToken(null, user)
+    await User.updateToken(null, user.id)
     res.status(200)
   } catch (e) {
     res.status(400).json({ error: e.message })
