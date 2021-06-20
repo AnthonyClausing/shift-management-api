@@ -13,4 +13,22 @@ const create = async (company: CompanyParams) => {
   }
 }
 
-export default { create }
+const locations = async (companyId: number) => {
+  try {
+    const locationQuery = await db.raw(`SELECT * FROM "location" WHERE company_id=${companyId}`)
+    return locationQuery.rows
+  } catch (err) {
+    throw new Error(`Something went wrong in Company model: ${err}`)
+  }
+}
+
+const users = async (companyId: number) => {
+  try {
+    const locationQuery = await db.raw(`SELECT * FROM "user" WHERE "user".company_id=${companyId}`)
+    return locationQuery.rows
+  } catch (err) {
+    throw new Error(`Something went wrong in Company model ${err}`)
+  }
+}
+
+export default { create, locations, users }

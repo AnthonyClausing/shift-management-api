@@ -11,22 +11,39 @@ export interface UserParams {
 }
 export interface UserData {
   id: number
+  company_id: number
   email: string
   auth_token: string
+  password_digest?: string
 }
 
 const create = async (params: UserParams, companyId: number): Promise<UserData> => {
   try {
     const hashedPassword = await Auth.hashPassword(params.password)
-    const token = await Auth.createToken()
-    const user = { ...params, password_digest: hashedPassword, token }
+    const user = { ...params, password_digest: hashedPassword }
     const userQuery = await db.raw(
-      'INSERT INTO "user" (company_id, email, password_digest, auth_token, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, email, auth_token',
-      [companyId, user.email, user.password_digest, user.token, user.first_name, user.last_name]
+      'INSERT INTO "user" (company_id, email, password_digest, first_name, last_name) VALUES (?, ?, ?, ?, ?) RETURNING id, email, auth_token, company_id',
+      [companyId, user.email, user.password_digest, user.first_name, user.last_name]
     )
     return userQuery.rows[0]
   } catch (err) {
     throw new Error('Could not create user in User Model')
+  }
+}
+const update = async (params: Array<Array<String>>, userId: number) => {
+  const setString = params.reduce((acc, curr, idx) => {
+    return curr[0] === 'id' ? acc : `${acc}${curr[0]} = '${curr[1]}', `
+  }, '')
+  try {
+    const userQuery = await db.raw(
+      `UPDATE "user" SET ${setString.slice(
+        0,
+        setString.length - 2
+      )} WHERE id = ${userId} RETURNING id, email, first_name, last_name`
+    )
+    return userQuery.rows[0]
+  } catch (err) {
+    throw new Error('Could not update user in User Model')
   }
 }
 
@@ -48,9 +65,18 @@ const createAssociations = async (
 }
 
 //if datbase isnt connected will database.raw still return undefined?
-const findBy = async (identifier: any, value: any) => {
+const findBy = async (identifier: any, value: any): Promise<UserData> => {
   const userQuery = await db.raw(`SELECT * FROM "user" WHERE ${identifier} = ?`, [value])
   return userQuery.rows[0]
+}
+
+//Instance methods
+const locations = async (userId: number) => {
+  //I feel like this should all be a class, no reason why I shouldnt have a 'this' for userId
+  const userQuery = await db.raw(
+    `SELECT * FROM "user_locations" JOIN "location" ON "user_locations".location_id="location".id WHERE user_id = ${userId}`
+  )
+  return userQuery.rows
 }
 
 const updateToken = async (token: any, id: number) => {
@@ -61,4 +87,4 @@ const updateToken = async (token: any, id: number) => {
   return updatedUser.rows[0]
 }
 
-export default { findBy, create, createAssociations, updateToken }
+export default { findBy, locations, create, update, createAssociations, updateToken }

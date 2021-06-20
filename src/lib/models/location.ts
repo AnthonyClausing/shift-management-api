@@ -13,7 +13,7 @@ export interface LocationParams {
 const create = async (location: LocationParams, companyId: number) => {
   try {
     const locationQuery = await db.raw(
-      'INSERT INTO location (company_id, name, formatted_address, display_address, country_code, state, county) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id',
+      'INSERT INTO location (company_id, name, formatted_address, display_address, country_code, state, county) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *',
       [
         companyId,
         location.name,

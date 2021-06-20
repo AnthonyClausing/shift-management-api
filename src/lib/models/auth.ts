@@ -3,7 +3,7 @@ import * as crypto from 'crypto'
 const bcrypt = require('bcrypt')
 
 const authenticate = async (userReq: { token: string; email: string }): Promise<boolean> => {
-  const user = await User.findBy('auth-token', userReq.token)
+  const user = await User.findBy('auth_token', userReq.token)
   return user.email === userReq.email
 }
 
@@ -22,9 +22,9 @@ const hashPassword = async (password: string): Promise<string> => {
   )
 }
 
-const checkPassword = async (rawPassword: string, user: { password_digest: string }): Promise<boolean> => {
+const checkPassword = async (rawPassword: string, password_digest: string): Promise<boolean> => {
   return new Promise((resolve, reject) =>
-    bcrypt.compare(rawPassword, user.password_digest, (err: any, response: boolean) => {
+    bcrypt.compare(rawPassword, password_digest, (err: any, response: boolean) => {
       if (err) {
         reject(err)
       } else if (response) {

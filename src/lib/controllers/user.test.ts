@@ -14,7 +14,7 @@ async function promiseEach(tables: string[], fn: (t: string) => Promise<void>) {
   }
 }
 async function truncate() {
-  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" cascade`))
+  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" RESTART IDENTITY`))
 }
 
 // function seed () {
@@ -98,7 +98,6 @@ describe('Integration Tests', function () {
           .send({ ...newUserParams, location: {} })
         expect(result.status).toBe(400)
         expect(result.body.error).toBe('Could not create location in Location Model')
-        // expect(result.body.error).toBe('A user with this email already exists')
       })
       it('a User could not be created', async () => {
         const result = await request(app)
@@ -106,7 +105,6 @@ describe('Integration Tests', function () {
           .send({ ...newUserParams, user: { ...newUserParams.user, first_name: null, last_name: null } })
         expect(result.status).toBe(400)
         expect(result.body.error).toBe('Could not create user in User Model')
-        // expect(result.body.error).toBe('A user with this email already exists')
       })
     })
     it('successfully creates a user', async () => {

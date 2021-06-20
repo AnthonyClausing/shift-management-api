@@ -1,11 +1,13 @@
 import User from '../models/user'
+import Company from '../models/company'
 import Location from '../models/location'
 import { Request, Response } from 'express'
 
 const index = async (req: Request, res: Response) => {
   try {
-    //const locations = await Location.findLocation()
-    res.sendStatus(200) //.json(locations)
+    const currentUser = await User.findBy('auth_token', req.headers.token)
+    const locations = await Company.locations(currentUser.company_id)
+    res.status(200).json(locations)
   } catch (e) {
     res.json({ status: 400, error: e.message })
   }
@@ -13,8 +15,9 @@ const index = async (req: Request, res: Response) => {
 
 const create = async (req: Request, res: Response) => {
   try {
-    //const newLocation = await Location.create({ ...req.body, ...req.params }, 5)
-    res.sendStatus(201) //.json({ location: newLocation })
+    const currentUser = await User.findBy('auth_token', req.headers.token)
+    const newLocation = await Location.create(req.body, currentUser.company_id)
+    res.status(201).json(newLocation)
   } catch (e) {
     res.json({ status: 400, error: e.message })
   }

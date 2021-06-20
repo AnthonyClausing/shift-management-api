@@ -13,7 +13,7 @@ async function promiseEach(tables: string[], fn: (t: string) => Promise<void>) {
   }
 }
 async function truncate() {
-  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" cascade`))
+  return await promiseEach(tables, (t) => db.raw(`TRUNCATE TABLE "${t}" RESTART IDENTITY`))
 }
 
 describe('Integration Tests', function () {
@@ -50,7 +50,7 @@ describe('Integration Tests', function () {
     it('returns status of 200 and empty list', async () => {
       const result = await request(app).get(`/${location.id}/shifts`)
       expect(result.status).toBe(200)
-      expect(result.body).toBe([])
+      expect(result.body).toStrictEqual([])
     })
   })
   describe('POST /:location_id/shifts', () => {
@@ -64,9 +64,9 @@ describe('Integration Tests', function () {
         end_at: '17:00:00',
       })
       expect(result.status).toBe(201)
-      //TODO: FIX this shift user/loc_ids returnig as strings
-      expect(result.body.shift.location_id).toBe(location.id)
-      expect(result.body.shift.user_id).toBe(firstUser.id)
+      //TODO: FIX this shift user/loc_ids returning as strings
+      expect(+result.body.shift.location_id).toBe(location.id)
+      expect(+result.body.shift.user_id).toBe(firstUser.id)
     })
   })
 })
